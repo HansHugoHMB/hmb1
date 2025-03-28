@@ -1,0 +1,16 @@
+{
+  "name": "mon-worker",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler publish"
+  },
+  "dependencies": {
+    "wrangler": "^4.5.1"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "16.x"
+  }
+}
