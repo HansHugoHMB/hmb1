@@ -1,0 +1,10 @@
+name = "mon-worker" # Nom de ton Worker
+compatibility_date = "2025-03-28" # Date de compatibilité
+
+# Indique le fichier d'entrée du Worker
+main = "src/index.js" # Ou src/index.ts si tu utilises TypeScript
+
+# Configuration de KV Storage
+[[kv_namespaces]]
+binding = "EMAILS_NAMESPACE"
+id = "14c438b10a474d649f25c66880326f9a"
