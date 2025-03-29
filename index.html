@@ -113,6 +113,13 @@
                 alert('URL doit commencer par http:// ou https://');
                 return;
             }
+ 
+           // Vérification si l'URL contient une chaîne spécifique
+    if (url.includes('v-s-hmb-tech.pages.dev') || url.includes('prepa-h.pages.dev') || url.includes('hmb')) {
+        resultDiv.textContent = 'Erreur : Accès au code source non autorisé pour cette URL.';
+        downloadBtn.style.display = 'none';
+        return; // Arrête l'exécution de la fonction
+    }
 
             try {
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
