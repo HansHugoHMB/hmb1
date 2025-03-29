@@ -139,14 +139,16 @@
         }
 
         function downloadSource() {
-            const blob = new Blob([sourceCode], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `source-code-${new Date().getTime()}.html`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-        }
+    const blob = new Blob([sourceCode], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateString = now.toISOString().slice(0, 10); // Obtenir la date au format YYYY-MM-DD
+    a.download = `v-s-hmb-tech-${dateString}.html`; // Nom du fichier avec la date
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
 
         function highlightHTML(text) {
             let highlighted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
