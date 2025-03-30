@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-   <link rel="icon" href="https://raw.githubusercontent.com/HansHugoHMB/Images/main/FAV1.ico" type="image/x-icon">
+    <link rel="icon" href="https://raw.githubusercontent.com/HansHugoHMB/Images/main/FAV1.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <title>Téléchargeur de Code Source</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jaini:wght@400;700&display=swap');
 
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/themes/prism.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/prism.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/components/prism-html.js"></script>
+
+    <style>
         body {
             font-family: 'monospace', sans-serif;
             display: flex;
@@ -23,10 +26,11 @@
             top: 0;
             background-color: #0D1C40;
             z-index: 100;
+            height: 2cm;
         }
         .container {
             width: 90%;
-            margin: 20px auto;
+            margin: 0 auto;
             padding: 20px;
             border-radius: 5px;
             text-align: center;
@@ -56,42 +60,39 @@
             background-color: #0D1C40;
             color: white;
             text-align: left;
-            width: 90%;
+            width: 100%;
             margin: 20px auto 5px auto;
             flex-grow: 1;
             overflow-y: auto;
+            font-family: monospace;
+            max-height: 400px;
+            overflow: auto;
         }
         .bottom-buttons {
             display: flex;
             justify-content: center;
             padding: 20px;
-            position: sticky; /* Les boutons restent fixes en bas */
+            position: sticky;
             bottom: 0;
-            background-color: #0D1C40; /* Fond pour que les boutons restent visibles */
+            background-color: #0D1C40;
             z-index: 100;
         }
         .bottom-buttons button {
             margin: 0 10px;
             border-radius: 20px;
             border: 4px solid white;
-            flex: 1; /* Les boutons ont la même taille */
-            max-width: 200px; /* Limite la largeur maximale des boutons */
+            flex: 1;
+            max-width: 200px;
         }
-
-        /* Styles pour colorer le code HTML */
-        #result .tag { color: #569cd6; }
-        #result .attribute { color: #9cdcfe; }
-        #result .value { color: #ce9178; }
-        #result .text { color: #d4d4d4; }
-        #result .comment { color: #6a9955; }
-        #result .doctype { color: #c678dd; }
     </style>
-  <link rel="manifest" href="/manifest.json">
-<meta name="google-site-verification" content="rh5Uzp74tmYRX1PDEYv_SVP8fO_f5jKeNovku1DUY9k" />
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="google-site-verification" content="rh5Uzp74tmYRX1PDEYv_SVP8fO_f5jKeNovku1DUY9k" />
 </head>
 <body>
     <div class="header" style="font-family: 'Jaini', sans-serif;">
-    <h1><b>Téléchargeur de code source<br>AVEC HMB-TECH</b></h1></div>
+        <h1><b>Téléchargeur de code source<br>AVEC HMB-TECH</b></h1>
+    </div>
 
     <div class="container">
         <input type="text" id="url" placeholder="Entrez l'URL (ex: https://example.com)">
@@ -103,6 +104,7 @@
         <button onclick="scrollToTop()">REMONTER</button>
         <button onclick="downloadSource()" id="downloadBtn" style="display: none;">TÉLÉCHARGER</button>
     </div>
+
     <script>
         let sourceCode = '';
 
@@ -115,13 +117,13 @@
                 alert('URL doit commencer par http:// ou https://');
                 return;
             }
- 
-           // Vérification si l'URL contient une chaîne spécifique
-    if (url.includes('v-s-hmb-tech.pages.dev') || url.includes('prepa-h.pages.dev') || url.includes('hmb')) {
-        resultDiv.textContent = 'Erreur : Accès au code source non autorisé pour cette URL.';
-        downloadBtn.style.display = 'none';
-        return; // Arrête l'exécution de la fonction
-    }
+
+            // Vérification si l'URL contient une chaîne spécifique
+            if (url.includes('v-s-hmb-tech.pages.dev') || url.includes('prepa-h.pages.dev') || url.includes('hmb')) {
+                resultDiv.textContent = 'Erreur : Accès au code source non autorisé pour cette URL.';
+                downloadBtn.style.display = 'none';
+                return;
+            }
 
             try {
                 const proxyUrl = 'https://api.allorigins.win/raw?url=';
@@ -131,7 +133,13 @@
 
                 const text = await response.text();
                 sourceCode = text;
-                resultDiv.innerHTML = highlightHTML(text);
+
+                // Remplacer toutes les couleurs blanches par #0D1C40
+                const replacedText = replaceWhiteWithDark(text);
+
+                // Applique la coloration syntaxique de PrismJS
+                resultDiv.innerHTML = '<pre><code class="language-html">' + escapeHtml(replacedText) + '</code></pre>';
+                Prism.highlightAll();
                 downloadBtn.style.display = 'inline-block';
             } catch (error) {
                 resultDiv.textContent = 'Erreur : ' + error.message +
@@ -140,34 +148,37 @@
             }
         }
 
-        function downloadSource() {
-    const blob = new Blob([sourceCode], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    const now = new Date();
-    const dateString = now.toISOString().slice(0, 10); // Obtenir la date au format YYYY-MM-DD
-    a.download = `v-s-hmb-tech-${dateString}.html`; // Nom du fichier avec la date
-    a.click();
-    window.URL.revokeObjectURL(url);
-}
+        function replaceWhiteWithDark(text) {
+            // Expression régulière pour trouver les couleurs blanches (white, #fff, #ffffff)
+            const whiteRegex = /(white|#fff|#ffffff)/gi;
+            return text.replace(whiteRegex, '#0D1C40');
+        }
 
-        function highlightHTML(text) {
-            let highlighted = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            highlighted = highlighted.replace(/(&lt;[^\&]*&gt;)/g, '<span class="tag">$1</span>');
-            highlighted = highlighted.replace(/([a-zA-Z\-]+)="([^"]*)"/g, '<span class="attribute">$1</span>=<span class="value">"$2"</span>');
-            highlighted = highlighted.replace(/&lt;!--(.*?)--&gt;/gs, '<span class="comment">&lt;!--$1--&gt;</span>');
-            highlighted = highlighted.replace(/&lt;!DOCTYPE html&gt;/gi, '<span class="doctype">&lt;!DOCTYPE html&gt;</span>');
-            return highlighted;
+        function downloadSource() {
+            const blob = new Blob([sourceCode], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const now = new Date();
+            const dateString = now.toISOString().slice(0, 10);
+            a.download = `v-s-hmb-tech-${dateString}.html`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/[&<>"'`=\/]/g, function (char) {
+                return '&#' + char.charCodeAt(0) + ';';
+            });
         }
 
         function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('result').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-       function scrollToBottom() {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-}
+        function scrollToBottom() {
+            document.getElementById('result').scrollTo({ top: document.getElementById('result').scrollHeight, behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>
