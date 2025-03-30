@@ -99,6 +99,7 @@
     </div>
     <div id="result"></div>
     <div class="bottom-buttons">
+        <button onclick="scrollToBottom()">DESCENDRE</button>
         <button onclick="scrollToTop()">REMONTER</button>
         <button onclick="downloadSource()" id="downloadBtn" style="display: none;">TÉLÉCHARGER</button>
     </div>
@@ -163,6 +164,10 @@
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
+       function scrollToBottom() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
     </script>
 </body>
 </html>
